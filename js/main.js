@@ -158,6 +158,17 @@ const startMessageTrial = {
     data: { trial_name: "start_message" }
 };
 
+// --- USC identity prime ---
+
+const uscIdentityPrime = {
+    type: jsPsychSurvey,
+    survey_json: content.uscPrimeContent,
+    data: {
+        trial_name: "usc_identity_prime",
+        prime_version: "placeholder"
+    }
+};
+
 
 // --- Video trial ---
 
@@ -234,6 +245,7 @@ timeline.push(
     fullscreen,
     demoTrial,
     startMessageTrial,
+    uscIdentityPrime,
     videoTimeline,
     demographicsTrial,
     completionTrial
