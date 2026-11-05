@@ -259,3 +259,21 @@ export const completionContent = {
             }
         ]
 };
+
+export const uscPrimeContent = {
+  title: "Brief reflection",
+  showQuestionNumbers: "off",
+  completeText: "Continue",
+  pages: [
+    {
+      elements: [
+        {
+          type: "comment",
+          name: "usc_identity_response",
+          title: "[USC identity-prime instructions here.]",
+          isRequired: true
+        }
+      ]
+    }
+  ]
+};
