@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Identity Impressions — Developer Preview</title>
+  <style>
+    html, body { margin: 0; height: 100%; font: 16px/1.5 system-ui, sans-serif; background: #f5f3f0; color: #252b35; }
+    #preview { display: block; width: 100%; height: 100%; border: 0; }
+    #notice { position: fixed; inset: 28px auto auto 28px; max-width: 620px; padding: 20px 24px; border: 1px solid #d5d0c8; border-radius: 12px; background: white; z-index: 10; }
+    #notice[hidden] { display: none; }
+    #notice h1 { font-size: 20px; margin: 0 0 8px; }
+    #notice p { margin: 8px 0; white-space: pre-wrap; }
+    #notice a { color: #8b1731; }
+  </style>
+</head>
+<body>
+  <section id="notice" role="status">
+    <h1>Opening developer preview…</h1>
+    <p id="message">Loading the study and its navigator.</p>
+    <a href="./">Open participant study</a>
+  </section>
+  <iframe id="preview" title="Study developer preview" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  <script type="module">
+    // Load the existing index.html and plugins. Only this separate preview page
+    // redirects imports of js/init.js to the initializer without saving callbacks.
+    const frame = document.querySelector("#preview");
+    const notice = document.querySelector("#notice");
+    const message = document.querySelector("#message");
+    const pageUrl = new URL(location.href);
+    const freshSeed = () => crypto.randomUUID();
+    if (!["usc_prime", "control"].includes(pageUrl.searchParams.get("condition"))) {
+      pageUrl.searchParams.set("condition", "usc_prime");
+    }
+    if (!pageUrl.searchParams.get("seed")) pageUrl.searchParams.set("seed", freshSeed());
+    history.replaceState(null, "", pageUrl);
+
+    window.addEventListener("message", event => {
+      if (event.source !== frame.contentWindow) return;
+      if (event.data?.type === "trait-preview-ready") notice.hidden = true;
+      if (event.data?.type === "trait-preview-error") {
+        notice.hidden = false;
+        notice.querySelector("h1").textContent = "Preview could not start";
+        message.textContent = event.data.message;
+      }
+    });
+
+    try {
+      if (!HTMLScriptElement.supports?.("importmap")) {
+        throw new Error("Use an up-to-date Chrome or Firefox browser for this preview.");
+      }
+      const indexUrl = new URL("./index.html", location.href);
+      const response = await fetch(indexUrl, { cache: "no-store" });
+      if (!response.ok) throw new Error(`Could not load index.html (HTTP ${response.status}).`);
+      const html = new DOMParser().parseFromString(await response.text(), "text/html");
+      const originalBase = html.querySelector("base[href]");
+      const baseUrl = new URL(originalBase?.getAttribute("href") || "./", indexUrl);
+      html.querySelectorAll("base").forEach(node => node.remove());
+      const base = document.createElement("base");
+      base.href = baseUrl.href;
+
+      const map = { imports: {}, scopes: {} };
+      for (const node of html.querySelectorAll('script[type="importmap"]')) {
+        const existing = JSON.parse(node.textContent);
+        Object.assign(map.imports, existing.imports);
+        for (const [scope, entries] of Object.entries(existing.scopes || {})) {
+          map.scopes[scope] = { ...map.scopes[scope], ...entries };
+        }
+        if (existing.integrity) map.integrity = { ...map.integrity, ...existing.integrity };
+        node.remove();
+      }
+      const participantInit = new URL("js/init.js", baseUrl).href;
+      const developerInit = new URL("./js/dev-init.js?v=1", location.href).href;
+      map.imports[participantInit] = developerInit;
+      for (const entries of Object.values(map.scopes)) entries[participantInit] = developerInit;
+      // Import maps do not rewrite a script element's src attribute.
+      for (const script of html.querySelectorAll('script[type="module"][src]')) {
+        const src = new URL(script.getAttribute("src"), baseUrl);
+        if (src.href === participantInit) {
+          script.src = developerInit;
+          script.removeAttribute("integrity");
+        }
+      }
+
+      const importMap = document.createElement("script");
+      importMap.type = "importmap";
+      importMap.textContent = JSON.stringify(map);
+      const setup = document.createElement("script");
+      const settings = {
+        condition: pageUrl.searchParams.get("condition"),
+        seed: pageUrl.searchParams.get("seed"),
+        step: pageUrl.searchParams.get("step"),
+        shellUrl: pageUrl.href,
+        studyUrl: indexUrl.href
+      };
+      setup.textContent = `window.__TRAIT_DEV_PREVIEW__ = ${JSON.stringify(settings).replaceAll("<", "\\u003c")};
+        window.addEventListener('error', e => { if (e.message) parent.postMessage({type:'trait-preview-error', message:e.message}, ${JSON.stringify(pageUrl.origin)}); });
+        window.addEventListener('unhandledrejection', e => parent.postMessage({type:'trait-preview-error', message:String(e.reason?.message || e.reason)}, ${JSON.stringify(pageUrl.origin)}));`;
+      // All three must precede the original module scripts.
+      html.head.prepend(base, importMap, setup);
+      // srcdoc keeps these study scripts in a separate document/module graph.
+      frame.srcdoc = "<!doctype html>\n" + html.documentElement.outerHTML;
+    } catch (error) {
+      notice.querySelector("h1").textContent = "Preview could not start";
+      message.textContent = error.message;
+    }
+  </script>
+</body>
+</html>
