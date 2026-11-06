@@ -225,7 +225,7 @@ const completionTrial = {
 };
 
 
-/ import { buildUscFourRoundExtension } from "./usc-four-rounds.js";
+import { buildUscFourRoundExtension } from "./usc-four-rounds.js";
 
 // Then replace everything from // --- Main timeline --- to the END of main.js
 // with the code below. Keep your existing participant-level condition assignment.
