@@ -225,16 +225,21 @@ const completionTrial = {
 };
 
 
+/ import { buildUscFourRoundExtension } from "./usc-four-rounds.js";
+
+// Then replace everything from // --- Main timeline --- to the END of main.js
+// with the code below. Keep your existing participant-level condition assignment.
+
 // --- Main timeline ---
 
-const videoTimeline = {
-    timeline: [
-        checkFullscreen(),
-        videoTrial,
-        ratingTrial
-    ],
-    timeline_variables: videoTimelineVariables
-};
+const { roundTrials, identificationTrial } = buildUscFourRoundExtension({
+    jsPsych,
+    condition,
+    videoTimelineVariables,
+    videoTrial,
+    ratingTrial,
+    checkFullscreen
+});
 
 timeline.push(
     browserCheck,
@@ -246,9 +251,9 @@ timeline.push(
     fullscreen,
     demoTrial,
     startMessageTrial,
-    uscIdentityPrime,
-    videoTimeline,
+    ...roundTrials,
     demographicsTrial,
+    identificationTrial,
     completionTrial
 );
 
