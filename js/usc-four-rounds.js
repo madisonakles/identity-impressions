@@ -47,26 +47,61 @@ function readResponse(value) {
 // Store raw numeric values plus five component means in the questionnaire's row.
 // Invalid or missing values are null, never silently converted to zero.
 // No global identification composite or latent factor scores are imposed.
+
+
 export function scoreLeachUsc(response) {
-  const answers = readResponse(response);
-  const scores = {};
-  let answered = 0;
-  for (const item of LEACH_USC_ITEMS) {
-    const raw = answers[item.id];
-    const value = typeof raw === "number" ? raw : typeof raw === "string" && /^[1-7]$/.test(raw) ? Number(raw) : NaN;
-    const valid = Number.isInteger(value) && value >= 1 && value <= 7;
-    scores[item.id] = valid ? value : null;
-    if (valid) answered++;
-  }
-  scores.USC_identification_n_answered = answered;
-  scores.USC_identification_complete = answered === 14;
-  for (const [component, numbers] of Object.entries(LEACH_COMPONENTS)) {
-    const values = numbers.map(n => scores[`USC_identification_${String(n).padStart(2, "0")}`]);
-    scores[`USC_identification_${component}_mean`] = values.every(v => v !== null)
-      ? values.reduce((sum, v) => sum + v, 0) / values.length : null;
-  }
-  return scores;
+    const parsed = readResponse(response);
+
+    const answers = parsed.USC_identification_matrix != null
+        ? readResponse(parsed.USC_identification_matrix)
+        : parsed;
+
+    const scores = {};
+    let answered = 0;
+
+    for (const item of LEACH_USC_ITEMS) {
+        const raw = answers[item.id];
+
+        const value =
+            typeof raw === "number"
+                ? raw
+                : typeof raw === "string" && /^[1-5]$/.test(raw)
+                  ? Number(raw)
+                  : NaN;
+
+        const valid =
+            Number.isInteger(value) &&
+            value >= 1 &&
+            value <= 5;
+
+        scores[item.id] = valid ? value : null;
+
+        if (valid) answered++;
+    }
+
+    scores.USC_identification_n_answered = answered;
+    scores.USC_identification_complete = answered === 14;
+
+    for (const [component, numbers] of Object.entries(LEACH_COMPONENTS)) {
+        const values = numbers.map(number =>
+            scores[
+                `USC_identification_${String(number).padStart(2, "0")}`
+            ]
+        );
+
+        scores[`USC_identification_${component}_mean`] =
+            values.every(value => value !== null)
+                ? values.reduce((sum, value) => sum + value, 0) /
+                  values.length
+                : null;
+    }
+
+    return scores;
 }
+
+
+
+
 
 export function buildUscFourRoundExtension({
   jsPsych, condition, videoTimelineVariables, videoTrial, ratingTrial,
@@ -124,16 +159,49 @@ export function buildUscFourRoundExtension({
       data: {...(ratingTrial.data ?? {}), ...metadata, trial_name: "ratings"}
     });
   }
-  const identificationTrial = {
-    type: surveyPlugin,
-    survey_json: copyJson(USC_IDENTIFICATION_CONTENT),
-    data: {
-      trial_name: "USC_identification", assessment_time: "after_all_four_rounds",
-      questionnaire: "Leach_2008_USC_referent_adaptation",
-      questionnaire_version: "1.0", item_count: 14, response_min: 1, response_max: 7,
-      condition
-    },
-    on_finish(data) { Object.assign(data, scoreLeachUsc(data.response)); }
-  };
-  return {roundTrials, identificationTrial, plan: planForData};
+    const identificationTrial = {
+        type: surveyPlugin,
+        survey_json: copyJson(USC_IDENTIFICATION_CONTENT),
+
+        // Require every row with either current or older SurveyJS.
+        survey_function: function (survey) {
+            const matrix = survey.getQuestionByName(
+                "USC_identification_matrix"
+            );
+
+            if (!matrix) return;
+
+            if ("eachRowRequired" in matrix) {
+                matrix.eachRowRequired = true;
+            } else {
+                matrix.isAllRowRequired = true;
+            }
+        },
+
+        data: {
+            trial_name: "USC_identification",
+            assessment_time: "after_all_four_rounds",
+            questionnaire: "Leach_2008_USC_referent_adaptation",
+            questionnaire_version: "USC_5point_matrix_v2",
+            item_count: 14,
+            response_min: 1,
+            response_max: 5,
+
+            item_display_order: JSON.stringify(
+                LEACH_USC_ITEMS.map(item => item.id)
+            ),
+
+            condition: condition
+        },
+
+        on_finish: function (data) {
+            Object.assign(data, scoreLeachUsc(data.response));
+        }
+    };
+
+    return {
+        roundTrials,
+        identificationTrial,
+        plan: planForData
+    };
 }
