@@ -164,20 +164,85 @@ export function buildUscFourRoundExtension({
         survey_json: copyJson(USC_IDENTIFICATION_CONTENT),
 
         // Require every row with either current or older SurveyJS.
-        survey_function: function (survey) {
+               survey_function: function (survey) {
+            survey.widthMode = "responsive";
+            survey.width = "100%";
+
             const matrix = survey.getQuestionByName(
                 "USC_identification_matrix"
             );
 
             if (!matrix) return;
 
+            matrix.width = "100%";
+            matrix.rowTitleWidth = "40%";
+            matrix.columnMinWidth = "0px";
+
             if ("eachRowRequired" in matrix) {
                 matrix.eachRowRequired = true;
             } else {
                 matrix.isAllRowRequired = true;
             }
-        },
 
+            survey.onAfterRenderQuestion.add(function (sender, options) {
+                if (
+                    options.question.name !==
+                    "USC_identification_matrix"
+                ) return;
+
+                const root = options.htmlElement;
+                root.classList.add("usc-identification-fit");
+
+                const doc = root.ownerDocument;
+
+                if (
+                    doc.getElementById("usc-identification-fit-style")
+                ) return;
+
+                const style = doc.createElement("style");
+                style.id = "usc-identification-fit-style";
+
+                style.textContent = `
+                    .usc-identification-fit {
+                        min-width: 0 !important;
+                        max-width: 100% !important;
+                        box-sizing: border-box;
+                    }
+
+                    .usc-identification-fit table {
+                        width: 100% !important;
+                        min-width: 0 !important;
+                        max-width: 100% !important;
+                        table-layout: fixed !important;
+                    }
+
+                    .usc-identification-fit th,
+                    .usc-identification-fit td {
+                        min-width: 0 !important;
+                        padding: 8px 6px !important;
+                        white-space: normal !important;
+                        overflow-wrap: anywhere;
+                    }
+
+                    .usc-identification-fit tr > :first-child,
+                    .usc-identification-fit col:first-child {
+                        width: 40% !important;
+                    }
+
+                    .usc-identification-fit tr > :not(:first-child),
+                    .usc-identification-fit col:not(:first-child) {
+                        width: 12% !important;
+                    }
+
+                    .usc-identification-fit .sv-string-viewer {
+                        white-space: normal !important;
+                        overflow-wrap: anywhere;
+                    }
+                `;
+
+                doc.head.append(style);
+            });
+        },
         data: {
             trial_name: "USC_identification",
             assessment_time: "after_all_four_rounds",
