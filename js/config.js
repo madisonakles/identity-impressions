@@ -32,11 +32,14 @@ export const config = {
 
 export const videoLists = [
     {
-        listName: "main", // The list name saved in data
-        selectionNum: 1, // How many videos to select from this list
-        shuffle: false, // Whether to shuffle the order of the videos or not (overriden by SHUFFLE_ALL)
+        listName: "main",
+        selectionNum: 4,
+        shuffle: false,
         videos: [
             "017.mp4",
+            "007.mp4",
+            "016.mp4",
+            "021.mp4"
         ]
     }
 ];
