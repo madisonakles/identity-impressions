@@ -1,5 +1,6 @@
 // --- Setup ---
 
+import { buildUscFourRoundExtension } from "./usc-four-rounds.js";
 import { jsPsych, setComplete } from "./init.js";
 import { config } from "./config.js";
 import * as utils from "./utils.js";
