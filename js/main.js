@@ -9,6 +9,17 @@ import * as content from "./content.js";
 const startTime = new Date().toLocaleString(); // Records the date and time at the start of the study
 const timeline = []; // Creates the experiment timeline
 
+// Assign each participant to one condition
+const condition = jsPsych.randomization.sampleWithoutReplacement(
+    ["usc_prime", "control"],
+    1
+)[0];
+
+// Record the assigned condition
+jsPsych.data.addProperties({
+    condition: condition
+});
+
 // Prevents modifying numeric answers when scrolling
 document.addEventListener("wheel", function (e) {
     if (document.activeElement.type === "number") {
