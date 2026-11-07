@@ -199,52 +199,175 @@ export const ratingContent = {
 };
 
 // --- Demographics ---
+
 export const demographicsContent = {
     title: "Demographics",
+    showQuestionNumbers: "off",
+    showProgressBar: "off",
+    widthMode: "responsive",
+    pageNextText: "Continue",
+    completeText: "Continue",
+
     pages: [
         {
-            elements:
-                [
-                    {
-                        type: "text",
-                        name: "age",
-                        title: "What is your age?",
-                        inputType: "number",
-                    },
-                    {
-                        type: "checkbox",
-                        name: "gender",
-                        title: "What gender do you identify with? (Select all that apply)",
-                        choices: ["Male", "Female", "Transgender", "Non-binary", "Not otherwise specified", "I do not wish to provide this information"],
-                    },
-                    {
-                        type: "checkbox",
-                        name: "race",
-                        title: "What race/ethnicity do you identify with? (Select all that apply)",
-                        choices: ["American Indian or Alaska Native", "Asian", "Black or African-American", "Native Hawaiian or Other Pacific Islander", "White", "Latino", "Other"],
-                    },
-                    {
-                        type: "radiogroup",
-                        name: "education",
-                        title: "What is the highest level of education you have received?",
-                        choices: ["Less than High School", "High School Diploma", "Some College", "Associate's Degree", "Bachelor's Degree", "Some Graduate School", "Master's Degree", "Doctoral Degree"],
-                    }
-                ]
+            name: "demographics_page",
+
+            elements: [
+                {
+                    type: "text",
+                    name: "age",
+                    title: "How old are you? (Please enter a numeric value)",
+                    inputType: "number",
+                    isRequired: true,
+
+                    validators: [
+                        {
+                            type: "numeric",
+                            text: "Please enter a numeric age."
+                        }
+                    ]
+                },
+
+                {
+                    type: "radiogroup",
+                    name: "gender",
+                    title: "What is your gender?",
+                    isRequired: true,
+                    colCount: 1,
+
+                    choices: [
+                        "Female",
+                        "Male",
+                        "Non-binary",
+                        "Prefer not to say"
+                    ]
+                },
+
+                {
+                    type: "radiogroup",
+                    name: "year",
+                    title: "What year are you in college?",
+                    isRequired: true,
+                    colCount: 1,
+
+                    choices: [
+                        "First year",
+                        "Second year",
+                        "Third year",
+                        "Fourth year",
+                        "Fifth year or beyond",
+                        "Graduate student",
+                        {
+                            value: "other",
+                            text: "Other (please specify)"
+                        }
+                    ]
+                },
+
+                {
+                    type: "text",
+                    name: "year_other",
+                    title: "Other (please specify):",
+                    visibleIf: "{year} = 'other'",
+                    isRequired: true,
+
+                    validators: [
+                        {
+                            type: "regex",
+                            regex: "\\S",
+                            text: "Please specify your year in college."
+                        }
+                    ]
+                },
+
+                {
+                    type: "checkbox",
+                    name: "race",
+
+                    title:
+                        "Please indicate your racial/ethnic affiliation (check all that apply):",
+
+                    isRequired: true,
+                    colCount: 1,
+
+                    choices: [
+                        "American Indian or Alaska Native",
+                        "Black or African American",
+                        "East Asian",
+                        "Hispanic or Latino/a",
+                        "Middle Eastern",
+                        "Pacific Islander or Native Hawaiian",
+                        "South Asian",
+                        "White or Caucasian",
+                        "Other",
+                        "Prefer not to say"
+                    ]
+                },
+
+                {
+                    type: "radiogroup",
+                    name: "poli_orient",
+
+                    title:
+                        "How would you describe your political orientation, generally speaking?",
+
+                    isRequired: true,
+                    colCount: 0,
+
+                    choices: [
+                        { value: 1, text: "Very liberal" },
+                        { value: 2, text: "Liberal" },
+                        { value: 3, text: "Somewhat liberal" },
+                        { value: 4, text: "Moderate" },
+                        { value: 5, text: "Somewhat conservative" },
+                        { value: 6, text: "Conservative" },
+                        { value: 7, text: "Very conservative" }
+                    ]
+                },
+
+                {
+                    type: "radiogroup",
+                    name: "attention",
+
+                    title:
+                        "To what extent did you pay attention to the questions in this survey?",
+
+                    isRequired: true,
+                    colCount: 0,
+
+                    choices: [
+                        { value: 1, text: "1. Not at all" },
+                        { value: 2, text: "2." },
+                        { value: 3, text: "3." },
+                        { value: 4, text: "4. Moderate attention" },
+                        { value: 5, text: "5." },
+                        { value: 6, text: "6." },
+                        { value: 7, text: "7. Full attention" }
+                    ]
+                }
+            ]
         },
+
         {
-            title: "Feedback",
-            elements:
-                [
-                    {
-                        type: "comment",
-                        name: "feedback",
-                        title: "Please let us know if any part of the study was confusing, unclear, or in need of improvement. We appreciate your feedback greatly!",
-                    }
-                ]
+            name: "feedback_page",
+
+            elements: [
+                {
+                    type: "comment",
+                    name: "feedback",
+
+                    title:
+                        "Thank you for completing the study! Please feel free to share any thoughts or comments below:",
+
+                    rows: 6,
+                    isRequired: false
+                }
+            ]
         }
-    ],
-    completeText: "Submit",
+    ]
 };
+
+
 
 // --- Completion ---
 export const completionContent = {
