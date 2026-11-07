@@ -262,8 +262,8 @@ timeline.push(
     demoTrial,
     startMessageTrial,
     ...roundTrials,
+  identificationTrial,
     demographicsTrial,
-    identificationTrial,
     completionTrial
 );
 
