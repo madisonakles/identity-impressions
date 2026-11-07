@@ -100,13 +100,35 @@ function buildScreens(timeline) {
     const group = round ? `Round ${round}` : ["demographics", "USC_identification", "info"].includes(name) ? "Ending" : "Before the task";
     // Individual instruction pages can be opened without completing earlier
     // pages. Other surveys retain their original complete page structure.
-    if (name === "instructions" && Array.isArray(trial.survey_json?.pages) && trial.survey_json.pages.length > 1) {
-      trial.survey_json.pages.forEach((page, index) => {
-        screens.push({ id: `${id}_page_${index + 1}`, label: `Instructions · page ${index + 1}`, group,
-          trial: { ...trial, survey_json: { ...trial.survey_json, pages: [page] } } });
-      });
-    } else screens.push({ id, label, group, trial });
-  }
+       if (
+        ["instructions", "demographics"].includes(name) &&
+        Array.isArray(trial.survey_json?.pages) &&
+        trial.survey_json.pages.length > 1
+    ) {
+        trial.survey_json.pages.forEach((page, index) => {
+            const pageLabel =
+                page.name === "feedback_page"
+                    ? "Feedback"
+                    : `${label} · page ${index + 1}`;
+
+            screens.push({
+                id: `${id}_page_${index + 1}`,
+                label: pageLabel,
+                group,
+
+                trial: {
+                    ...trial,
+
+                    survey_json: {
+                        ...trial.survey_json,
+                        pages: [page]
+                    }
+                }
+            });
+        });
+    } else {
+        screens.push({ id, label, group, trial });
+    }
   if (!screens.length) throw new Error("No named screens found. This navigator expects the main.js and four-round add-on used in your study.");
   return screens;
 }
