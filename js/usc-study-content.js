@@ -221,40 +221,11 @@ export const USC_IDENTIFICATION_CONTENT = {
 
 export function makeUscPrimeSurvey(prime) {
 
-    // USC Prime 1: behaviors, values, and an example.
-    if (prime.id === "USC_prime_01") {
-
-        // Required single-line response box.
-        const requiredText = (name, title) => ({
-            type: "text",
-            name: name,
-            title: title,
-            inputType: "text",
-            isRequired: true,
-            requiredErrorText: "Please enter a response.",
-
-            validators: [
-                {
-                    type: "regex",
-                    regex: "\\S",
-                    text: "Please enter a response."
-                }
-            ]
-        });
-
-        // Safely display text and the logo path in HTML.
-        const escapeHtml = value =>
-            String(value).replace(/[&<>"']/g, character => ({
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#39;"
-            })[character]);
-
+    // Placeholder format for Prime 4.
+    if (prime.isPlaceholder || !prime.groups) {
         return {
+            title: "Brief reflection",
             showQuestionNumbers: "off",
-            showProgressBar: "off",
             completeText: "Continue",
 
             pages: [
@@ -262,92 +233,12 @@ export function makeUscPrimeSurvey(prime) {
                     name: prime.id,
 
                     elements: [
-
-                        // USC logo.
-                        {
-                            type: "html",
-                            name: "USC_prime_01_logo",
-
-                            html: `
-                                <div style="text-align:center; margin:0 0 24px;">
-                                    <img
-                                        src="${escapeHtml(USC_LOGO_PATH)}"
-                                        alt="USC logo"
-                                        style="display:inline-block;
-                                               width:220px;
-                                               max-width:70%;
-                                               height:auto;"
-                                    >
-                                </div>
-                            `
-                        },
-
-                        // Introduction.
-                        {
-                            type: "html",
-                            name: "USC_prime_01_introduction",
-                            html: `<p>${escapeHtml(prime.instructions)}</p>`
-                        },
-
-                        // Two behaviors: separate single-line boxes.
-                        {
-                            type: "panel",
-                            name: "USC_prime_01_behaviors",
-
-                            title:
-                                "Please list two things USC students do relatively often.",
-
-                            elements: [
-                                requiredText(
-                                    "USC_prime_01_behavior_1",
-                                    "1."
-                                ),
-                                requiredText(
-                                    "USC_prime_01_behavior_2",
-                                    "2."
-                                )
-                            ]
-                        },
-
-                        // Two values: separate single-line boxes.
-                        {
-                            type: "panel",
-                            name: "USC_prime_01_values",
-
-                            title:
-                                "Please list two values USC students endorse.",
-
-                            elements: [
-                                requiredText(
-                                    "USC_prime_01_value_1",
-                                    "1."
-                                ),
-                                requiredText(
-                                    "USC_prime_01_value_2",
-                                    "2."
-                                )
-                            ]
-                        },
-
-                        // Example: larger text-entry box.
                         {
                             type: "comment",
                             name: "prime_response",
-
-                            title:
-                                "Pick one of the values you listed above, and please briefly describe a time when a USC student exhibited this value.",
-
-                            rows: 6,
+                            title: prime.instructions,
                             isRequired: true,
-                            requiredErrorText: "Please enter a response.",
-
-                            validators: [
-                                {
-                                    type: "regex",
-                                    regex: "\\S",
-                                    text: "Please enter a response."
-                                }
-                            ]
+                            maxLength: 8000
                         }
                     ]
                 }
@@ -355,11 +246,36 @@ export function makeUscPrimeSurvey(prime) {
         };
     }
 
+    // Required single-line response box.
+    const requiredText = (name, title) => ({
+        type: "text",
+        name: name,
+        title: title,
+        inputType: "text",
+        isRequired: true,
+        requiredErrorText: "Please enter a response.",
 
-    // Placeholder pages for USC Primes 2, 3, and 4.
+        validators: [
+            {
+                type: "regex",
+                regex: "\\S",
+                text: "Please enter a response."
+            }
+        ]
+    });
+
+    const escapeHtml = value =>
+        String(value).replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[character]);
+
     return {
-        title: "Brief reflection",
         showQuestionNumbers: "off",
+        showProgressBar: "off",
         completeText: "Continue",
 
         pages: [
@@ -367,12 +283,63 @@ export function makeUscPrimeSurvey(prime) {
                 name: prime.id,
 
                 elements: [
+
+                    // USC logo.
+                    {
+                        type: "html",
+                        name: `${prime.id}_logo`,
+
+                        html: `
+                            <div style="text-align:center; margin:0 0 24px;">
+                                <img
+                                    src="${escapeHtml(USC_LOGO_PATH)}"
+                                    alt="USC logo"
+                                    style="display:inline-block;
+                                           width:220px;
+                                           max-width:70%;
+                                           height:auto;"
+                                >
+                            </div>
+                        `
+                    },
+
+                    // Introduction.
+                    {
+                        type: "html",
+                        name: `${prime.id}_introduction`,
+                        html: `<p>${escapeHtml(prime.instructions)}</p>`
+                    },
+
+                    // Two question groups, each with two single-line boxes.
+                    ...prime.groups.map(group => ({
+                        type: "panel",
+                        name: `${prime.id}_${group.name}`,
+                        title: group.title,
+
+                        elements: group.fields.map((field, index) =>
+                            requiredText(
+                                `${prime.id}_${field}`,
+                                `${index + 1}.`
+                            )
+                        )
+                    })),
+
+                    // Larger required writing box.
                     {
                         type: "comment",
                         name: "prime_response",
-                        title: prime.instructions,
+                        title: prime.reflection,
+                        rows: 6,
                         isRequired: true,
-                        maxLength: 8000
+                        requiredErrorText: "Please enter a response.",
+
+                        validators: [
+                            {
+                                type: "regex",
+                                regex: "\\S",
+                                text: "Please enter a response."
+                            }
+                        ]
                     }
                 ]
             }
