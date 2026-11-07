@@ -9,20 +9,71 @@ export const USC_PRIMES = [
         id: "USC_prime_01",
         instructions:
             "We are interested in learning about you as a USC student, please answer the following questions to help us learn more information about USC students.",
-        isPlaceholder: false
+        isPlaceholder: false,
+
+        groups: [
+            {
+                name: "behaviors",
+                title: "Please list two things USC students do relatively often.",
+                fields: ["behavior_1", "behavior_2"]
+            },
+            {
+                name: "values",
+                title: "Please list two values USC students endorse.",
+                fields: ["value_1", "value_2"]
+            }
+        ],
+
+        reflection:
+            "Pick one of the values you listed above, and please briefly describe a time when a USC student exhibited this value."
     },
+
     {
         id: "USC_prime_02",
         instructions:
-            "[PLACEHOLDER: Paste USC identity-prime 2 instructions here.]",
-        isPlaceholder: true
+            "We are interested in learning about you as a USC student, please answer the following questions to help us learn more information about USC students.",
+        isPlaceholder: false,
+
+        groups: [
+            {
+                name: "behaviors",
+                title: "Please list two things USC students do relatively well.",
+                fields: ["behavior_1", "behavior_2"]
+            },
+            {
+                name: "values",
+                title: "Please list two values USC students endorse.",
+                fields: ["value_1", "value_2"]
+            }
+        ],
+
+        reflection:
+            "Pick one of the values you listed above, and please briefly describe a time when a USC student exhibited this value."
     },
+
     {
         id: "USC_prime_03",
         instructions:
-            "[PLACEHOLDER: Paste USC identity-prime 3 instructions here.]",
-        isPlaceholder: true
+            "We are interested in learning about you as a USC student, please answer the following questions to help us learn more information about USC students.",
+        isPlaceholder: false,
+
+        groups: [
+            {
+                name: "interests",
+                title: "What are two things USC students are interested in?",
+                fields: ["interest_1", "interest_2"]
+            },
+            {
+                name: "pride",
+                title: "What are two things that make you proud to be a USC student?",
+                fields: ["pride_1", "pride_2"]
+            }
+        ],
+
+        reflection:
+            "Please pick ONE of the points of pride you thought of. What is a time when a USC student demonstrated it?"
     },
+
     {
         id: "USC_prime_04",
         instructions:
@@ -30,6 +81,10 @@ export const USC_PRIMES = [
         isPlaceholder: true
     }
 ];
+
+
+
+
 
 
 // --- USC identification: 14-item Leach scale adaptation ---
