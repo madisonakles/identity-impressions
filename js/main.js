@@ -285,6 +285,7 @@ const { roundTrials, identificationTrial } = buildUscFourRoundExtension({
 });
 
 timeline.push(
+    consentTrial
     browserCheck,
     checkSafari(),
     preloadVideos,
