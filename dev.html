@@ -105,9 +105,9 @@ window.addEventListener('error', e => {
     }, new URL(window.__TRAIT_DEV_PREVIEW__.shellUrl).origin);
 });
         window.addEventListener('unhandledrejection', e => parent.postMessage({type:'trait-preview-error', message:String(e.reason?.message || e.reason)}, ${JSON.stringify(pageUrl.origin)}));`;
-      // All three must precede the original module scripts.
+      /// All three must precede the original module scripts.
       html.head.prepend(base, importMap, setup);
-      // srcdoc keeps these study scripts in a separate document/module graph.
+      /// srcdoc keeps these study scripts in a separate document/module graph.
       frame.srcdoc = "<!doctype html>\n" + html.documentElement.outerHTML;
     } catch (error) {
       notice.querySelector("h1").textContent = "Preview could not start";
