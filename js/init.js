@@ -26,6 +26,9 @@ function saveData(name, data) {
 // Initialize jsPsych and handle study completion
 export const jsPsych = initJsPsych({
     on_finish: function () {
+        if (jsPsych.data.get().filter({ consent_given: false }).count() > 0) {
+    return;
+}
         if (complete) {
             // Study completed
             if (config.DEBUG_SAVE) {
