@@ -1,4 +1,4 @@
-// --- Screener ---
+// --- Screener ----
 export const screenerContent = {
     title: "Welcome to the experiment!",
     elements:
