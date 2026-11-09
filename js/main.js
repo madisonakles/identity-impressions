@@ -33,6 +33,39 @@ document.addEventListener("wheel", function (e) {
 const urlParams = new URLSearchParams(window.location.search);
 const prolificID = urlParams.get("PROLIFIC_PID") || "unknown"; // If no Prolific ID is provided in the URL, the ID will be reported as 'unknown'
 
+// --- Consent ---
+
+const consentTrial = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: content.consentContent,
+    choices: ["Yes", "No"],
+
+    data: {
+        trial_name: "consent",
+        consent_version: "Social_Decisions_Study_v1"
+    },
+
+    on_finish: function (data) {
+        const agreed = data.response === 0;
+
+        data.consent_given = agreed;
+        data.consent_response = agreed ? "Yes" : "No";
+
+        jsPsych.data.addProperties({
+            consent_given: agreed,
+            consent_version: "Social_Decisions_Study_v1"
+        });
+
+        if (!agreed) {
+            setComplete(false);
+
+            jsPsych.abortExperiment(
+                "<p>You have chosen not to participate, so the study has ended.</p>" +
+                "<p>You may close this tab.</p>"
+            );
+        }
+    }
+};
 
 // --- Safari Warning ---
 
