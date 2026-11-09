@@ -129,6 +129,7 @@ function buildScreens(timeline) {
     } else {
         screens.push({ id, label, group, trial });
     }
+  }
   if (!screens.length) throw new Error("No named screens found. This navigator expects the main.js and four-round add-on used in your study.");
   return screens;
 }
