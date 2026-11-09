@@ -70,7 +70,7 @@
         node.remove();
       }
       const participantInit = new URL("js/init.js", baseUrl).href;
-      const developerInit = new URL("./js/dev-init.js?v=1", location.href).href;
+      const developerInit = new URL("./js/dev-init.js?v=2", location.href).href;
       map.imports[participantInit] = developerInit;
       for (const entries of Object.values(map.scopes)) entries[participantInit] = developerInit;
       // Import maps do not rewrite a script element's src attribute.
