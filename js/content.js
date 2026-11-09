@@ -400,3 +400,109 @@ export const uscPrimeContent = {
     }
   ]
 };
+
+export const consentContent = `
+<div style="max-width:900px; margin:0 auto; text-align:left;
+            line-height:1.6; padding:24px 16px; box-sizing:border-box;">
+
+    <h2>Social Decisions Study</h2>
+
+    <p>
+        You are invited to participate in a research study. Your participation
+        is voluntary. This document explains information about this study.
+        You should ask questions about anything that is unclear to you.
+    </p>
+
+    <h3>PURPOSE OF THE STUDY</h3>
+
+    <p>
+        The purpose of this study is to understand how one's social
+        environment influences the way they interact with, perceive, and
+        think about others and themselves. Social judgments are often
+        studied in isolated individuals, but a person's social environment
+        can shape the way they think about others.
+    </p>
+
+    <p>
+        We hope to learn how these environments influence social judgment
+        and choice. You are invited as a possible participant because you
+        are in the healthy adult population of an online survey platform.
+    </p>
+
+    <p>
+        For scientific reasons, this consent form does not include complete
+        information about the study hypotheses and the research questions
+        being tested. You will be fully debriefed following your
+        participation in the research.
+    </p>
+
+    <h3>PARTICIPANT INVOLVEMENT</h3>
+
+    <p>
+        If you agree to take part in this study, you will be asked to
+        complete tasks related to social judgments and choices and ratings
+        about the stimuli you have seen. You will be asked to fill out
+        questionnaires and lastly provide demographic information. The study
+        will take about 15 minutes. You do not have to answer any questions
+        you don’t want to and can leave the study at any time.
+    </p>
+
+    <h3>COMPENSATION FOR PARTICIPATION</h3>
+
+    <p>
+        You will receive 0.5 SONA credits for completing the study.
+    </p>
+
+    <h3>CONFIDENTIALITY</h3>
+
+    <p>
+        The members of the research team and the University of Southern
+        California’s Human Subjects Protection Program (HSPP) may access the
+        data. The HSPP reviews and monitors research studies to protect the
+        rights and welfare of research subjects.
+    </p>
+
+    <p>
+        Your data and/or specimens collected as part of this research will
+        be used or distributed for future research studies without your
+        additional informed consent. Any information that identifies you
+        (such as your name) will be removed from the data or specimens before
+        being shared with others or used in future research studies.
+    </p>
+
+    <p>
+        To ensure confidentiality, data and/or specimens will be labeled
+        with a code that the research team can link to personal identifying
+        information. When the results of the research are published or
+        discussed in conferences, no identifiable information will be used.
+        Data transfer will be encrypted, and data will be stored
+        electronically, with appropriate electronic safeguards and limited
+        to authorized study personnel. Your data will be retained by the
+        investigator for future use indefinitely.
+    </p>
+
+    <h3>INVESTIGATOR CONTACT INFORMATION</h3>
+
+    <p>
+        Principal Investigator Leor Hackel via email at
+        <a href="mailto:lhackel@usc.edu">lhackel@usc.edu</a>.
+        If you have any questions about this study, please contact the
+        co-investigator Madison Akles at
+        <a href="mailto:akles@usc.edu">akles@usc.edu</a>
+    </p>
+
+    <h3>IRB CONTACT INFORMATION</h3>
+
+    <p>
+        University of Southern California Institutional Review Board,
+        1640 Marengo Street, Suite 700, Los Angeles, CA 90033-9269.
+        Phone (323) 442-0114 or email
+        <a href="mailto:irb@usc.edu">irb@usc.edu</a>
+    </p>
+
+    <p>
+        <strong>Do you consent to participate in the study?</strong>
+    </p>
+
+</div>
+`;
