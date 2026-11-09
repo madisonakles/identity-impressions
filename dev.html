@@ -94,7 +94,16 @@
         studyUrl: indexUrl.href
       };
       setup.textContent = `window.__TRAIT_DEV_PREVIEW__ = ${JSON.stringify(settings).replaceAll("<", "\\u003c")};
-        window.addEventListener('error', e => { if (e.message) parent.postMessage({type:'trait-preview-error', message:e.message}, ${JSON.stringify(pageUrl.origin)}); });
+window.addEventListener('error', e => {
+    if (!e.message) return;
+
+    parent.postMessage({
+        type: 'trait-preview-error',
+        message:
+            (e.filename || 'Unknown script') + ':' +
+            e.lineno + ':' + e.colno + ' — ' + e.message
+    }, new URL(window.__TRAIT_DEV_PREVIEW__.shellUrl).origin);
+});
         window.addEventListener('unhandledrejection', e => parent.postMessage({type:'trait-preview-error', message:String(e.reason?.message || e.reason)}, ${JSON.stringify(pageUrl.origin)}));`;
       // All three must precede the original module scripts.
       html.head.prepend(base, importMap, setup);
