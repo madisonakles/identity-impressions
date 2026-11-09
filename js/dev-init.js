@@ -1,4 +1,4 @@
-// Loaded ONLY through dev.html's import map. The participant's init.js is not
+/// Loaded ONLY through dev.html's import map. The participant's init.js is not
 // imported, so its saving, completion, and redirect callbacks are not registered.
 const settings = globalThis.__TRAIT_DEV_PREVIEW__;
 if (!settings || !["usc_prime", "control"].includes(settings.condition)) {
