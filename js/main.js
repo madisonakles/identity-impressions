@@ -36,9 +36,9 @@ const prolificID = urlParams.get("PROLIFIC_PID") || "unknown"; // If no Prolific
 // --- Consent ---
 
 const consentTrial = {
-    type: jsPsychHtmlButtonResponse,
-    stimulus: content.consentContent,
-    choices: ["Yes", "No"],
+
+type: jsPsychSurvey,
+survey_json: content.consentContent, 
 
     data: {
         trial_name: "consent",
@@ -46,7 +46,7 @@ const consentTrial = {
     },
 
     on_finish: function (data) {
-        const agreed = data.response === 0;
+        const agreed = data.response.consent === "Yes";
 
         data.consent_given = agreed;
         data.consent_response = agreed ? "Yes" : "No";
@@ -285,6 +285,7 @@ const { roundTrials, identificationTrial } = buildUscFourRoundExtension({
 });
 
 timeline.push(
+    screenerTrial,
     consentTrial,
     browserCheck,
     checkSafari(),
