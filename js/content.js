@@ -401,11 +401,9 @@ export const uscPrimeContent = {
   ]
 };
 
-export const consentContent = `
-<div style="max-width:900px; margin:0 auto; text-align:left;
-            line-height:1.6; padding:24px 16px; box-sizing:border-box;">
+const consentInformation = `
 
-    <h2>Social Decisions Study</h2>
+
 
     <p>
         You are invited to participate in a research study. Your participation
@@ -500,9 +498,24 @@ export const consentContent = `
         <a href="mailto:irb@usc.edu">irb@usc.edu</a>
     </p>
 
-    <p>
-        <strong>Do you consent to participate in the study?</strong>
-    </p>
 
-</div>
+
 `;
+export const consentContent = {
+    title: "Social Decisions Study",
+    elements: [
+        {
+            type: "html",
+            name: "consent_information",
+            html: consentInformation
+        },
+        {
+            type: "radiogroup",
+            name: "consent",
+            title: "Do you consent to participate in the study?",
+            choices: ["Yes", "No"],
+            isRequired: true
+        }
+    ],
+    completeText: "Continue"
+};
