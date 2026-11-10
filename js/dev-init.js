@@ -152,7 +152,6 @@ function element(tag, text, attributes = {}) {
 
 function mountNavigator(screens, activeIndex) {
   const nav = element("aside", null, { id: "trait-dev-nav", "aria-label": "Developer study navigator" });
-  nav.append(element("p", "DEVELOPER PREVIEW", { class: "dev-eyebrow" }));
   const heading = element("div", null, { class: "dev-title-row" });
   const hide = element("button", "Hide", { id: "dev-hide", type: "button" });
   hide.onclick = () => document.body.classList.add("trait-dev-hidden");
