@@ -157,7 +157,7 @@ function mountNavigator(screens, activeIndex) {
   const hide = element("button", "Hide", { id: "dev-hide", type: "button" });
   hide.onclick = () => document.body.classList.add("trait-dev-hidden");
   heading.append(element("h1", "Study navigator"), hide);
-  nav.append(heading, element("p", "Jump to any screen. No answers needed. Each jump starts a fresh screen preview.", { class: "dev-note" }));
+  nav.append(heading);
   nav.append(element("label", "Condition", { for: "dev-condition" }));
   const select = element("select", null, { id: "dev-condition" });
   for (const [value, label] of [["usc_prime", "USC prime"], ["control", "Control · no primes"]]) {
