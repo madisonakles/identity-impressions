@@ -264,7 +264,192 @@ export function makeUscPrimeSurvey(prime, { showUscLogo = true } = {}) {
         typeof prime.reflection !== "string" || !prime.reflection.trim()) {
         throw new Error("Each reflection needs two question groups with two response boxes each, plus a short-answer question.");
     }
+function appendUscPrototypePages() {
+  const traits = [
+    "Ambition", "Artistic skills", "Compassion",
+    "Conscientiousness", "Creativity", "Emotional stability",
+    "Extraversion", "High status", "Humility", "Humor",
+    "Independence", "Intelligence", "Networking skills",
+    "Open-mindedness", "Physical attractiveness", "Physical health",
+    "Predictability", "Problem-solving skills", "Public speaking skills",
+    "Risk-taking", "Similarity", "Adventurous", "Cheerful",
+    "Cooperative", "Dutiful", "Emotional", "Friendly",
+    "Intellectual", "Self-Disciplined", "Sympathetic",
+    "Trustworthy", "Angry", "Anxious", "Assertive",
+    "Cautious", "Depressed"
+  ];
 
+  function scale(first, middle, last) {
+    return Array.from({ length: 7 }, (_, index) => {
+      const value = index + 1;
+
+      const label =
+        value === 1 ? first :
+        value === 4 ? middle :
+        value === 7 ? last : "";
+
+      return {
+        value,
+        text: `${value}.${label ? " " + label : ""}`
+      };
+    });
+  }
+
+  function rating(name, title, choices) {
+    return {
+      type: "radiogroup",
+      name,
+      title,
+      isRequired: true,
+      colCount: 0,
+      choices
+    };
+  }
+
+  function matrix(name, title) {
+    return {
+      type: "matrix",
+      name,
+      title,
+
+      isRequired: true,
+      eachRowRequired: true,
+      isAllRowRequired: true,
+
+      requiredErrorText:
+        "Please select one response for every trait.",
+
+      width: "100%",
+      rowTitleWidth: "28%",
+      columnMinWidth: "0px",
+
+      rows: traits.map(text => ({
+        value: text.toLowerCase().replace(/[^a-z0-9]+/g, "_"),
+        text
+      })),
+
+      columns: scale(
+        "Not essential at all",
+        "Moderately important",
+        "Very essential"
+      )
+    };
+  }
+
+  USC_IDENTIFICATION_CONTENT.pageNextText = "Continue";
+  USC_IDENTIFICATION_CONTENT.pagePrevText = "Back";
+
+  USC_IDENTIFICATION_CONTENT.pages.push(
+    {
+      name: "group_proto_description_page",
+      title: "Group perception (USC)",
+
+      elements: [
+        {
+          type: "html",
+          name: "group_proto_instructions",
+
+          html: `
+            <p>
+              Imagine an <b>ideal USC student</b>.
+              In a few sentences, describe what this ideal USC
+              student should be like. For example, you can write
+              about the following:
+            </p>
+
+            <ul>
+              <li>What traits or qualities should this person possess?</li>
+              <li>What are this person's typical behaviors within the group?</li>
+              <li>What does this person value the most?</li>
+              <li>What accomplishments should this person have?</li>
+            </ul>
+          `
+        },
+
+        {
+          type: "comment",
+          name: "group_proto_resp",
+          title: "Your description",
+          rows: 6,
+          isRequired: true,
+
+          validators: [
+            {
+              type: "regex",
+              regex: "\\S",
+              text: "Please enter a response."
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      name: "group_proto_followups_page",
+      title: "Your description of the ideal USC student",
+
+      description: "{group_proto_resp}",
+
+      elements: [
+        rating(
+          "group_proto_self",
+          "Consider your description of the ideal USC student above. To what extent does it describe you?",
+          scale(
+            "Not accurate at all",
+            "",
+            "Very accurate description"
+          )
+        ),
+
+        rating(
+          "group_proto_motive",
+          "Consider your description of the ideal USC student above. How much do you want to become like that/stay that way in the future?",
+          scale(
+            "Not at all",
+            "Moderately",
+            "Very much"
+          )
+        ),
+
+        rating(
+          "group_proto_possible",
+          "Consider your description of the ideal USC student above. How easily can you imagine yourself becoming like that/staying that way in the future?",
+          scale(
+            "Not at all",
+            "",
+            "Very easily"
+          )
+        )
+      ]
+    },
+
+    {
+      name: "group_proto_traits_page",
+      title: "The ideal USC student",
+
+      elements: [
+        matrix(
+          "group_proto_trait",
+          "Consider the ideal USC student. How essential is each of the following traits for this ideal USC student?"
+        )
+      ]
+    },
+
+    {
+      name: "group_proto_self_traits_page",
+      title: "Describing yourself",
+
+      elements: [
+        matrix(
+          "group_proto_traitSlf",
+          "Consider the traits and skills you saw before. How well does each trait/skill describe you?"
+        )
+      ]
+    }
+  );
+}
+
+appendUscPrototypePages();
     // Required single-line response box.
     const requiredText = (name, title) => ({
         type: "text",
