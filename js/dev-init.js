@@ -74,7 +74,7 @@ const labels = {
   demo: "Practice video",
   start_message: "Start message",
   demographics: "Demographics",
-  USC_identification: "USC identification · 14 items",
+  USC_identification: "USC identification + group prototype",
   info: "Completion page"
 };
 const setupNames = new Set(["browser_check", "preload", "fullscreen", "re-fullscreen"]);
