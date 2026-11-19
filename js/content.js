@@ -27,7 +27,7 @@ export const screenerContent = {
     completeText: "Continue",
 };
 
-// --- Traits List ---
+// -- Traits List --
 const traits = [
     // name = name used in data, title = name shown in study, def = definition shown in instructions and tooltips
     { name: "openness", title: "Open to new experiences", def: "willingness to try new things and to explore new ideas" },
