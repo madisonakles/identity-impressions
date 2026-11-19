@@ -13,19 +13,19 @@ export const USC_PRIMES = [
 
         groups: [
             {
+                name: "common",
+                title: "Please list two things that USC students share in common.",
+                fields: ["common_1", "common_2"]
+            },
+            {
                 name: "behaviors",
                 title: "Please list two things USC students do relatively often.",
                 fields: ["behavior_1", "behavior_2"]
-            },
-            {
-                name: "values",
-                title: "Please list two values USC students endorse.",
-                fields: ["value_1", "value_2"]
             }
         ],
 
         reflection:
-            "Pick one of the values you listed above, and please briefly describe a time when a USC student exhibited this value."
+            "Pick one of the things you listed above, and please briefly describe a time when a USC student did this."
     },
 
     {
@@ -81,14 +81,14 @@ export const USC_PRIMES = [
         isPlaceholder: false,
         groups: [
             {
-                name: "question_1",
+                name: "experience",
                 title: "Please list two experiences USC students commonly share.",
-                fields: ["question_1_response_1", "question_1_response_2"]
+                fields: ["experience_1", "experience_2"]
             },
             {
-                name: "question_2",
+                name: "together",
                 title: "Please list two things that bring USC students together.",
-                fields: ["question_2_response_1", "question_2_response_2"]
+                fields: ["together_1", "together_2"]
             }
         ],
         reflection:
@@ -96,30 +96,52 @@ export const USC_PRIMES = [
     }
 ];
 
-// Each control block has the same two question groups (two response boxes per
-// question) and short-answer box as the identity blocks. Replace only the
-// bracketed wording when the control materials are ready.
-export const CONTROL_PRIMES = Array.from({ length: 4 }, (_, index) => {
-    const number = index + 1;
-    return {
-        id: `CONTROL_prime_${String(number).padStart(2, "0")}`,
-        instructions: `[PLACEHOLDER: Control block ${number} instructions.]`,
-        isPlaceholder: true,
-        groups: [
-            {
-                name: "question_1",
-                title: `[PLACEHOLDER: Control block ${number}, question 1. Ask for two responses.]`,
-                fields: ["question_1_response_1", "question_1_response_2"]
-            },
-            {
-                name: "question_2",
-                title: `[PLACEHOLDER: Control block ${number}, question 2. Ask for two responses.]`,
-                fields: ["question_2_response_1", "question_2_response_2"]
-            }
+// CONTROL PRIMES
+export const CONTROL_PRIMES = [
+    {
+        questions: [
+            "Please list two things that describe you as an individual.",
+            "Please list two things you do relatively often."
         ],
-        reflection: `[PLACEHOLDER: Control block ${number}, short-answer question.]`
-    };
-});
+        reflection:
+            "Pick one of the things you listed above, and please briefly describe a time when you did this."
+    },
+    {
+        questions: [
+            "Please list two things you do relatively well.",
+            "Please list two values you endorse."
+        ],
+        reflection:
+            "Pick one of the values you listed above, and please briefly describe a time when you exhibited this value."
+    },
+    {
+        questions: [
+            "What are two things you are interested in?",
+            "What are two things that make you proud of yourself?"
+        ],
+        reflection:
+            "Please pick ONE of the points of pride you thought of. What is a time when you demonstrated it?"
+    },
+    {
+        questions: [
+            "Please list two experiences you commonly have.",
+            "Please list two things that help you feel like yourself."
+        ],
+        reflection:
+            "Pick one of the things you listed above, and please briefly describe a time when it helped you feel like yourself."
+    }
+].map((wording, index) => ({
+    id: `CONTROL_prime_${String(index + 1).padStart(2, "0")}`,
+    instructions:
+        "We are interested in learning about you as an individual, please answer the following questions to help us learn more information about you.",
+    isPlaceholder: false,
+    groups: USC_PRIMES[index].groups.map((group, questionIndex) => ({
+        name: group.name,
+        title: wording.questions[questionIndex],
+        fields: [...group.fields]
+    })),
+    reflection: wording.reflection
+}));
 
 
 
