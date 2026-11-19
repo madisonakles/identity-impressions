@@ -94,9 +94,11 @@ function buildScreens(timeline) {
     occurrences.set(base, occurrence);
     const id = occurrence === 1 ? base : `${base}_${occurrence}`;
     let label = labels[name] || name.replaceAll("_", " ");
+    const videoPosition = trial.data?.video_position_in_round;
     if (name === "usc_identity_prime") label = `Round ${round}: USC prime · ${trial.data.prime_id}`;
-    if (name === "video") label = `Round ${round}: video · ${String(trial.video).split("/").pop()}`;
-    if (name === "ratings") label = `Round ${round}: video ratings`;
+    if (name === "control_prime") label = `Round ${round}: control reflection · ${trial.data.prime_id}`;
+    if (name === "video") label = `Round ${round}: video ${videoPosition} of 2 · ${String(trial.video).split("/").pop()}`;
+    if (name === "ratings") label = `Round ${round}: video ${videoPosition} ratings`;
     const group = round ? `Round ${round}` : ["demographics", "USC_identification", "info"].includes(name) ? "Ending" : "Before the task";
     // Individual instruction pages can be opened without completing earlier
     // pages. Other surveys retain their original complete page structure.
@@ -159,7 +161,7 @@ function mountNavigator(screens, activeIndex) {
   nav.append(heading);
   nav.append(element("label", "Condition", { for: "dev-condition" }));
   const select = element("select", null, { id: "dev-condition" });
-  for (const [value, label] of [["usc_prime", "USC prime"], ["control", "Control · no primes"]]) {
+  for (const [value, label] of [["usc_prime", "USC prime"], ["control", "Control · matching reflections"]]) {
     select.append(element("option", label, { value }));
   }
   select.value = settings.condition;
@@ -203,10 +205,11 @@ function mountNavigator(screens, activeIndex) {
 function runPreview(timeline) {
   const screens = buildScreens(timeline);
   let activeIndex = screens.findIndex(screen => screen.id === settings.step);
-  // Switching to control while viewing a prime should land on the matching
-  // round's video rather than restarting the entire task.
-  if (activeIndex < 0 && /^usc_identity_prime_round_[1-4]$/.test(settings.step || "")) {
-    activeIndex = screens.findIndex(screen => screen.id === settings.step.replace("usc_identity_prime", "video"));
+  // Switching conditions preserves the reflection's round in either direction.
+  if (activeIndex < 0 && /^(usc_identity_prime|control_prime)_round_[1-4]$/.test(settings.step || "")) {
+    const matchingStep = settings.step.replace(/^(usc_identity_prime|control_prime)/,
+      settings.condition === "control" ? "control_prime" : "usc_identity_prime");
+    activeIndex = screens.findIndex(screen => screen.id === matchingStep);
   }
   if (activeIndex < 0) activeIndex = 0;
   mountNavigator(screens, activeIndex);
