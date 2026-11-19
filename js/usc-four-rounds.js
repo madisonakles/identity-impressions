@@ -1,5 +1,5 @@
 import {
-  USC_PRIMES, LEACH_USC_ITEMS, LEACH_COMPONENTS,
+  USC_PRIMES, CONTROL_PRIMES, LEACH_USC_ITEMS, LEACH_COMPONENTS,
   USC_IDENTIFICATION_CONTENT, makeUscPrimeSurvey
 } from "./usc-study-content.js";
 
@@ -13,26 +13,40 @@ function assertPermutation(before, after, key, label) {
 }
 
 // Calls shuffle separately for primes and videos. There is no fixed pairing.
-export function makeFourRoundPlan(videos, shuffle) {
-  if (!Array.isArray(videos) || videos.length !== 4) {
-    throw new Error("The four-round task needs exactly 4 selected main videos. Set one video list's selectionNum to 4 and list four main filenames in config.js.");
+export function makeFourRoundPlan(videos, shuffle, condition = "usc_prime") {
+  if (!["usc_prime", "control"].includes(condition)) {
+    throw new Error('Condition must be "usc_prime" or "control".');
   }
-  if (videos.some(v => typeof v.video !== "string" || !v.video.trim())) {
+  if (!Array.isArray(videos) || videos.length !== 8) {
+    throw new Error("The four-round task needs exactly 8 selected main videos. Set one video list's selectionNum to 8 and list eight main filenames in config.js.");
+  }
+  if (typeof shuffle !== "function") {
+    throw new Error("Pass a shuffle function for the independent prime and video orders.");
+  }
+  if (videos.some(v => !v || typeof v.video !== "string" || !v.video.trim())) {
     throw new Error("Each main video must have a nonempty video path from utils.setupMedia().");
+  }
+  if (videos.some(v => /REPLACE_WITH_VIDEO_/i.test(v.video))) {
+    throw new Error("Replace the four additional video filename placeholders in js/config.js with real filenames from assets/stimuli before running the study.");
   }
   const normalizedVideos = videos.map(v => ({
     ...v,
     video_id: v.video_id ?? v.video.split("/").pop().replace(/\.mp4$/i, ""),
     list_name: v.list_name ?? "main"
   }));
-  if (new Set(normalizedVideos.map(v => v.video)).size !== 4 || new Set(normalizedVideos.map(v => String(v.video_id))).size !== 4) {
-    throw new Error("Use four different main video files with unique video IDs.");
+  if (new Set(normalizedVideos.map(v => v.video)).size !== 8 || new Set(normalizedVideos.map(v => String(v.video_id))).size !== 8) {
+    throw new Error("Use eight different main video files with unique video IDs.");
   }
-  const primeOrder = shuffle([...USC_PRIMES]);
+  const primes = condition === "usc_prime" ? USC_PRIMES : CONTROL_PRIMES;
+  const primeOrder = shuffle([...primes]);
   const videoOrder = shuffle([...normalizedVideos]);
-  assertPermutation(USC_PRIMES, primeOrder, p => p.id, "prime");
+  assertPermutation(primes, primeOrder, p => p.id, "prime");
   assertPermutation(normalizedVideos, videoOrder, v => v.video, "video");
-  return videoOrder.map((video, index) => ({round: index + 1, prime: primeOrder[index], video}));
+  return primeOrder.map((prime, index) => ({
+    round: index + 1,
+    prime,
+    videos: videoOrder.slice(index * 2, index * 2 + 2)
+  }));
 }
 
 function readResponse(value) {
@@ -113,51 +127,77 @@ export function buildUscFourRoundExtension({
   if (!surveyPlugin || !videoTrial || !ratingTrial || typeof checkFullscreen !== "function") {
     throw new Error("Pass the template's existing videoTrial, ratingTrial, checkFullscreen, and jsPsychSurvey plugin.");
   }
-  const plan = makeFourRoundPlan(videoTimelineVariables, values => jsPsych.randomization.shuffle(values));
-  const primeShown = condition === "usc_prime";
-  const planForData = plan.map(({round, prime, video}) => ({
-    round, planned_prime_id: prime.id, presented_prime_id: primeShown ? prime.id : null,
-    video_id: video.video_id, video_path: video.video
+  const plan = makeFourRoundPlan(videoTimelineVariables, values => jsPsych.randomization.shuffle(values), condition);
+  const isIdentityCondition = condition === "usc_prime";
+  const planForData = plan.map(({round, prime, videos}) => ({
+    round,
+    planned_prime_id: prime.id,
+    presented_prime_id: prime.id,
+    prime_type: isIdentityCondition ? "usc_identity" : "control",
+    prime_is_placeholder: Boolean(prime.isPlaceholder),
+    videos: videos.map((video, index) => ({
+      video_id: video.video_id,
+      video_path: video.video,
+      video_position_in_round: index + 1,
+      video_sequence_number: (round - 1) * 2 + index + 1
+    }))
   }));
   jsPsych.data.addProperties({
     condition,
-    task_design_version: "USC_four_rounds_v1",
+    task_design_version: "USC_four_rounds_eight_videos_v2",
     task_run_id: jsPsych.randomization.randomID(16),
-    main_trial_count: 4,
+    main_trial_count: 8,
+    prime_count: 4,
+    videos_per_round: 2,
     prime_order_planned: JSON.stringify(plan.map(r => r.prime.id)),
-    prime_order_presented: JSON.stringify(primeShown ? plan.map(r => r.prime.id) : []),
-    video_order: JSON.stringify(plan.map(r => r.video.video_id)),
+    prime_order_presented: JSON.stringify(plan.map(r => r.prime.id)),
+    video_order: JSON.stringify(plan.flatMap(r => r.videos.map(v => v.video_id))),
     round_pairings: JSON.stringify(planForData)
   });
   const roundTrials = [];
-  for (const {round, prime, video} of plan) {
+  for (const {round, prime, videos} of plan) {
     const metadata = {
-      round, video_id: video.video_id, list_name: video.list_name,
-      planned_prime_id: prime.id, prime_id: primeShown ? prime.id : null,
-      prime_presented: primeShown, condition
+      round,
+      planned_prime_id: prime.id,
+      prime_id: prime.id,
+      prime_presented: true,
+      identity_prime_presented: isIdentityCondition,
+      prime_type: isIdentityCondition ? "usc_identity" : "control",
+      prime_is_placeholder: Boolean(prime.isPlaceholder),
+      round_video_ids: JSON.stringify(videos.map(v => v.video_id)),
+      condition
     };
     const fullscreenNode = checkFullscreen();
     fullscreenNode.data = {...(fullscreenNode.data ?? {}), ...metadata};
     roundTrials.push(fullscreenNode);
-    if (primeShown) {
+    roundTrials.push({
+      type: surveyPlugin,
+      survey_json: makeUscPrimeSurvey(prime, { showUscLogo: isIdentityCondition }),
+      data: {...metadata, trial_name: isIdentityCondition ? "usc_identity_prime" : "control_prime"},
+      on_finish(data) {
+        const response = readResponse(data.response);
+        data.prime_response = response.prime_response ?? null;
+        data.prime_responses_json = JSON.stringify(response);
+      }
+    });
+    for (const [index, video] of videos.entries()) {
+      const videoMetadata = {
+        ...metadata,
+        video_id: video.video_id,
+        list_name: video.list_name,
+        video_position_in_round: index + 1,
+        video_sequence_number: (round - 1) * 2 + index + 1
+      };
+      // Explicit paths preserve the existing video-description and rating trials.
       roundTrials.push({
-        type: surveyPlugin,
-        survey_json: makeUscPrimeSurvey(prime),
-        data: {...metadata, trial_name: "usc_identity_prime", prime_is_placeholder: Boolean(prime.isPlaceholder)},
-        on_finish(data) {
-          data.prime_response = readResponse(data.response).prime_response ?? null;
-        }
+        ...videoTrial, video: video.video,
+        data: {...(videoTrial.data ?? {}), ...videoMetadata, trial_name: "video"}
+      });
+      roundTrials.push({
+        ...ratingTrial,
+        data: {...(ratingTrial.data ?? {}), ...videoMetadata, trial_name: "ratings"}
       });
     }
-    // Explicit video paths replace the old timeline-variable placeholders here.
-    roundTrials.push({
-      ...videoTrial, video: video.video,
-      data: {...(videoTrial.data ?? {}), ...metadata, trial_name: "video"}
-    });
-    roundTrials.push({
-      ...ratingTrial,
-      data: {...(ratingTrial.data ?? {}), ...metadata, trial_name: "ratings"}
-    });
   }
     const identificationTrial = {
         type: surveyPlugin,
@@ -270,3 +310,4 @@ export function buildUscFourRoundExtension({
         plan: planForData
     };
 }
+
