@@ -60,6 +60,12 @@ export const instructionsContent = {
                             </ol>
                         </div>
                         <p>You will repeat these steps for each video.</p>
+                        <p>
+    The main task has <b>four rounds</b>.
+    In each round, you will complete a brief written reflection
+    and then watch and evaluate <b>two videos</b>,
+    for a total of <b>eight main videos</b>.
+</p>
                         <p>In the next few pages, you will learn more about each step of the experiment.</p>
                     `
                 }
