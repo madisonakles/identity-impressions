@@ -77,10 +77,49 @@ export const USC_PRIMES = [
     {
         id: "USC_prime_04",
         instructions:
-            "[PLACEHOLDER: Paste USC identity-prime 4 instructions here.]",
-        isPlaceholder: true
+            "We are interested in learning about you as a USC student, please answer the following questions to help us learn more information about USC students.",
+        isPlaceholder: false,
+        groups: [
+            {
+                name: "question_1",
+                title: "Please list two experiences USC students commonly share.",
+                fields: ["question_1_response_1", "question_1_response_2"]
+            },
+            {
+                name: "question_2",
+                title: "Please list two things that bring USC students together.",
+                fields: ["question_2_response_1", "question_2_response_2"]
+            }
+        ],
+        reflection:
+            "Pick one of the things you listed above, and please briefly describe a time when you saw it bring USC students together"
     }
 ];
+
+// Each control block has the same two question groups (two response boxes per
+// question) and short-answer box as the identity blocks. Replace only the
+// bracketed wording when the control materials are ready.
+export const CONTROL_PRIMES = Array.from({ length: 4 }, (_, index) => {
+    const number = index + 1;
+    return {
+        id: `CONTROL_prime_${String(number).padStart(2, "0")}`,
+        instructions: `[PLACEHOLDER: Control block ${number} instructions.]`,
+        isPlaceholder: true,
+        groups: [
+            {
+                name: "question_1",
+                title: `[PLACEHOLDER: Control block ${number}, question 1. Ask for two responses.]`,
+                fields: ["question_1_response_1", "question_1_response_2"]
+            },
+            {
+                name: "question_2",
+                title: `[PLACEHOLDER: Control block ${number}, question 2. Ask for two responses.]`,
+                fields: ["question_2_response_1", "question_2_response_2"]
+            }
+        ],
+        reflection: `[PLACEHOLDER: Control block ${number}, short-answer question.]`
+    };
+});
 
 
 
@@ -219,31 +258,11 @@ export const USC_IDENTIFICATION_CONTENT = {
 
 
 
-export function makeUscPrimeSurvey(prime) {
-
-    // Placeholder format for Prime 4.
-    if (prime.isPlaceholder || !prime.groups) {
-        return {
-            title: "Brief reflection",
-            showQuestionNumbers: "off",
-            completeText: "Continue",
-
-            pages: [
-                {
-                    name: prime.id,
-
-                    elements: [
-                        {
-                            type: "comment",
-                            name: "prime_response",
-                            title: prime.instructions,
-                            isRequired: true,
-                            maxLength: 8000
-                        }
-                    ]
-                }
-            ]
-        };
+export function makeUscPrimeSurvey(prime, { showUscLogo = true } = {}) {
+    if (!Array.isArray(prime.groups) || prime.groups.length !== 2 ||
+        prime.groups.some(group => !Array.isArray(group.fields) || group.fields.length !== 2) ||
+        typeof prime.reflection !== "string" || !prime.reflection.trim()) {
+        throw new Error("Each reflection needs two question groups with two response boxes each, plus a short-answer question.");
     }
 
     // Required single-line response box.
@@ -284,8 +303,8 @@ export function makeUscPrimeSurvey(prime) {
 
                 elements: [
 
-                    // USC logo.
-                    {
+                    // Identity branding is shown only in the USC condition.
+                    ...(showUscLogo ? [{
                         type: "html",
                         name: `${prime.id}_logo`,
 
@@ -301,7 +320,7 @@ export function makeUscPrimeSurvey(prime) {
                                 >
                             </div>
                         `
-                    },
+                    }] : []),
 
                     // Introduction.
                     {
@@ -330,6 +349,7 @@ export function makeUscPrimeSurvey(prime) {
                         name: "prime_response",
                         title: prime.reflection,
                         rows: 6,
+                        maxLength: 8000,
                         isRequired: true,
                         requiredErrorText: "Please enter a response.",
 
@@ -346,3 +366,4 @@ export function makeUscPrimeSurvey(prime) {
         ]
     };
 }
+
