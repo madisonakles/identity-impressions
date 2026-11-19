@@ -33,12 +33,16 @@ export const config = {
 export const videoLists = [
     {
         listName: "main",
-        selectionNum: 4,
+        selectionNum: 8,
         shuffle: false,
         videos: [
-            "017.mp4",
+            "000.mp4",
+            "003.mp4",
             "007.mp4",
+            "012.mp4",
+            "013.mp4",
             "016.mp4",
+            "017.mp4",
             "021.mp4"
         ]
     }
