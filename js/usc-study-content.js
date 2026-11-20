@@ -277,15 +277,6 @@ export const USC_IDENTIFICATION_CONTENT = {
     ]
 };
 
-
-
-
-export function makeUscPrimeSurvey(prime, { showUscLogo = true } = {}) {
-    if (!Array.isArray(prime.groups) || prime.groups.length !== 2 ||
-        prime.groups.some(group => !Array.isArray(group.fields) || group.fields.length !== 2) ||
-        typeof prime.reflection !== "string" || !prime.reflection.trim()) {
-        throw new Error("Each reflection needs two question groups with two response boxes each, plus a short-answer question.");
-    }
 function appendUscPrototypePages() {
   const traits = [
     "Ambition", "Artistic skills", "Compassion",
@@ -472,6 +463,15 @@ function appendUscPrototypePages() {
 }
 
 appendUscPrototypePages();
+
+
+export function makeUscPrimeSurvey(prime, { showUscLogo = true } = {}) {
+    if (!Array.isArray(prime.groups) || prime.groups.length !== 2 ||
+        prime.groups.some(group => !Array.isArray(group.fields) || group.fields.length !== 2) ||
+        typeof prime.reflection !== "string" || !prime.reflection.trim()) {
+        throw new Error("Each reflection needs two question groups with two response boxes each, plus a short-answer question.");
+    }
+
     // Required single-line response box.
     const requiredText = (name, title) => ({
         type: "text",
