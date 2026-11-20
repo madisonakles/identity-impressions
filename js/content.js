@@ -152,7 +152,11 @@ export const audioCheckContent = {
 const traitSliders = traits.map(trait => ({
     type: "slider",
     name: trait.name,
-    title: `${trait.title} <span class="tooltip-wrapper">🛈<span class="tooltip-box">${trait.def}</span></span>`,
+   title: `${trait.title}
+  <span class="tooltip-wrapper trait-info-tooltip" tabindex="0">
+    <span class="trait-info-icon" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1px solid currentColor;border-radius:50%;font:bold 13px/1 Arial,sans-serif;cursor:help;">?</span>
+    <span class="tooltip-box">${trait.def}</span>
+  </span>`,
     min: 0,
     max: 10,
     defaultValue: 5,
