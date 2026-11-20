@@ -27,7 +27,7 @@ export const screenerContent = {
     completeText: "Continue",
 };
 
-// -- Traits List --
+// --- Traits List ---
 const traits = [
     // name = name used in data, title = name shown in study, def = definition shown in instructions and tooltips
     { name: "openness", title: "Open to new experiences", def: "willingness to try new things and to explore new ideas" },
@@ -60,12 +60,7 @@ export const instructionsContent = {
                             </ol>
                         </div>
                         <p>You will repeat these steps for each video.</p>
-                        <p>
-    The main task has <b>four rounds</b>.
-    In each round, you will complete a brief written reflection
-    and then watch and evaluate <b>two videos</b>,
-    for a total of <b>eight main videos</b>.
-</p>
+                        <p>The main task has <b>four rounds</b>. In each round, you will complete a brief written reflection and then watch and evaluate <b>two videos</b>, for a total of <b>eight main videos</b>.</p>
                         <p>In the next few pages, you will learn more about each step of the experiment.</p>
                     `
                 }

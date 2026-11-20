@@ -13,19 +13,19 @@ export const USC_PRIMES = [
 
         groups: [
             {
-                name: "common",
-                title: "Please list two things that USC students share in common.",
-                fields: ["common_1", "common_2"]
-            },
-            {
                 name: "behaviors",
                 title: "Please list two things USC students do relatively often.",
                 fields: ["behavior_1", "behavior_2"]
+            },
+            {
+                name: "values",
+                title: "Please list two values USC students endorse.",
+                fields: ["value_1", "value_2"]
             }
         ],
 
         reflection:
-            "Pick one of the things you listed above, and please briefly describe a time when a USC student did this."
+            "Pick one of the values you listed above, and please briefly describe a time when a USC student exhibited this value."
     },
 
     {
@@ -81,14 +81,14 @@ export const USC_PRIMES = [
         isPlaceholder: false,
         groups: [
             {
-                name: "experience",
+                name: "question_1",
                 title: "Please list two experiences USC students commonly share.",
-                fields: ["experience_1", "experience_2"]
+                fields: ["question_1_response_1", "question_1_response_2"]
             },
             {
-                name: "together",
+                name: "question_2",
                 title: "Please list two things that bring USC students together.",
-                fields: ["together_1", "together_2"]
+                fields: ["question_2_response_1", "question_2_response_2"]
             }
         ],
         reflection:
@@ -96,52 +96,30 @@ export const USC_PRIMES = [
     }
 ];
 
-// CONTROL PRIMES
-export const CONTROL_PRIMES = [
-    {
-        questions: [
-            "Please list two things that describe you as an individual.",
-            "Please list two things you do relatively often."
+// Each control block has the same two question groups (two response boxes per
+// question) and short-answer box as the identity blocks. Replace only the
+// bracketed wording when the control materials are ready.
+export const CONTROL_PRIMES = Array.from({ length: 4 }, (_, index) => {
+    const number = index + 1;
+    return {
+        id: `CONTROL_prime_${String(number).padStart(2, "0")}`,
+        instructions: `[PLACEHOLDER: Control block ${number} instructions.]`,
+        isPlaceholder: true,
+        groups: [
+            {
+                name: "question_1",
+                title: `[PLACEHOLDER: Control block ${number}, question 1. Ask for two responses.]`,
+                fields: ["question_1_response_1", "question_1_response_2"]
+            },
+            {
+                name: "question_2",
+                title: `[PLACEHOLDER: Control block ${number}, question 2. Ask for two responses.]`,
+                fields: ["question_2_response_1", "question_2_response_2"]
+            }
         ],
-        reflection:
-            "Pick one of the things you listed above, and please briefly describe a time when you did this."
-    },
-    {
-        questions: [
-            "Please list two things you do relatively well.",
-            "Please list two values you endorse."
-        ],
-        reflection:
-            "Pick one of the values you listed above, and please briefly describe a time when you exhibited this value."
-    },
-    {
-        questions: [
-            "What are two things you are interested in?",
-            "What are two things that make you proud of yourself?"
-        ],
-        reflection:
-            "Please pick ONE of the points of pride you thought of. What is a time when you demonstrated it?"
-    },
-    {
-        questions: [
-            "Please list two experiences you commonly have.",
-            "Please list two things that help you feel like yourself."
-        ],
-        reflection:
-            "Pick one of the things you listed above, and please briefly describe a time when it helped you feel like yourself."
-    }
-].map((wording, index) => ({
-    id: `CONTROL_prime_${String(index + 1).padStart(2, "0")}`,
-    instructions:
-        "We are interested in learning about you as an individual, please answer the following questions to help us learn more information about you.",
-    isPlaceholder: false,
-    groups: USC_PRIMES[index].groups.map((group, questionIndex) => ({
-        name: group.name,
-        title: wording.questions[questionIndex],
-        fields: [...group.fields]
-    })),
-    reflection: wording.reflection
-}));
+        reflection: `[PLACEHOLDER: Control block ${number}, short-answer question.]`
+    };
+});
 
 
 
@@ -277,192 +255,7 @@ export const USC_IDENTIFICATION_CONTENT = {
     ]
 };
 
-function appendUscPrototypePages() {
-  const traits = [
-    "Ambition", "Artistic skills", "Compassion",
-    "Conscientiousness", "Creativity", "Emotional stability",
-    "Extraversion", "High status", "Humility", "Humor",
-    "Independence", "Intelligence", "Networking skills",
-    "Open-mindedness", "Physical attractiveness", "Physical health",
-    "Predictability", "Problem-solving skills", "Public speaking skills",
-    "Risk-taking", "Similarity", "Adventurous", "Cheerful",
-    "Cooperative", "Dutiful", "Emotional", "Friendly",
-    "Intellectual", "Self-Disciplined", "Sympathetic",
-    "Trustworthy", "Angry", "Anxious", "Assertive",
-    "Cautious", "Depressed"
-  ];
 
-  function scale(first, middle, last) {
-    return Array.from({ length: 7 }, (_, index) => {
-      const value = index + 1;
-
-      const label =
-        value === 1 ? first :
-        value === 4 ? middle :
-        value === 7 ? last : "";
-
-      return {
-        value,
-        text: `${value}.${label ? " " + label : ""}`
-      };
-    });
-  }
-
-  function rating(name, title, choices) {
-    return {
-      type: "radiogroup",
-      name,
-      title,
-      isRequired: true,
-      colCount: 0,
-      choices
-    };
-  }
-
-  function matrix(name, title) {
-    return {
-      type: "matrix",
-      name,
-      title,
-
-      isRequired: true,
-      eachRowRequired: true,
-      isAllRowRequired: true,
-
-      requiredErrorText:
-        "Please select one response for every trait.",
-
-      width: "100%",
-      rowTitleWidth: "28%",
-      columnMinWidth: "0px",
-
-      rows: traits.map(text => ({
-        value: text.toLowerCase().replace(/[^a-z0-9]+/g, "_"),
-        text
-      })),
-
-      columns: scale(
-        "Not essential at all",
-        "Moderately important",
-        "Very essential"
-      )
-    };
-  }
-
-  USC_IDENTIFICATION_CONTENT.pageNextText = "Continue";
-  USC_IDENTIFICATION_CONTENT.pagePrevText = "Back";
-
-  USC_IDENTIFICATION_CONTENT.pages.push(
-    {
-      name: "group_proto_description_page",
-      title: "Group perception (USC)",
-
-      elements: [
-        {
-          type: "html",
-          name: "group_proto_instructions",
-
-          html: `
-            <p>
-              Imagine an <b>ideal USC student</b>.
-              In a few sentences, describe what this ideal USC
-              student should be like. For example, you can write
-              about the following:
-            </p>
-
-            <ul>
-              <li>What traits or qualities should this person possess?</li>
-              <li>What are this person's typical behaviors within the group?</li>
-              <li>What does this person value the most?</li>
-              <li>What accomplishments should this person have?</li>
-            </ul>
-          `
-        },
-
-        {
-          type: "comment",
-          name: "group_proto_resp",
-          title: "Your description",
-          rows: 6,
-          isRequired: true,
-
-          validators: [
-            {
-              type: "regex",
-              regex: "\\S",
-              text: "Please enter a response."
-            }
-          ]
-        }
-      ]
-    },
-
-    {
-      name: "group_proto_followups_page",
-      title: "Your description of the ideal USC student",
-
-      description: "{group_proto_resp}",
-
-      elements: [
-        rating(
-          "group_proto_self",
-          "Consider your description of the ideal USC student above. To what extent does it describe you?",
-          scale(
-            "Not accurate at all",
-            "",
-            "Very accurate description"
-          )
-        ),
-
-        rating(
-          "group_proto_motive",
-          "Consider your description of the ideal USC student above. How much do you want to become like that/stay that way in the future?",
-          scale(
-            "Not at all",
-            "Moderately",
-            "Very much"
-          )
-        ),
-
-        rating(
-          "group_proto_possible",
-          "Consider your description of the ideal USC student above. How easily can you imagine yourself becoming like that/staying that way in the future?",
-          scale(
-            "Not at all",
-            "",
-            "Very easily"
-          )
-        )
-      ]
-    },
-
-    {
-      name: "group_proto_traits_page",
-      title: "The ideal USC student",
-
-      elements: [
-        matrix(
-          "group_proto_trait",
-          "Consider the ideal USC student. How essential is each of the following traits for this ideal USC student?"
-        )
-      ]
-    },
-
-    {
-      name: "group_proto_self_traits_page",
-      title: "Describing yourself",
-
-      elements: [
-        matrix(
-          "group_proto_traitSlf",
-          "Consider the traits and skills you saw before. How well does each trait/skill describe you?"
-        )
-      ]
-    }
-  );
-}
-
-appendUscPrototypePages();
 
 
 export function makeUscPrimeSurvey(prime, { showUscLogo = true } = {}) {
@@ -573,4 +366,3 @@ export function makeUscPrimeSurvey(prime, { showUscLogo = true } = {}) {
         ]
     };
 }
-

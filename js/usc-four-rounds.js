@@ -299,49 +299,9 @@ export function buildUscFourRoundExtension({
             condition: condition
         },
 
-       on_finish: function (data) {
-    const response = readResponse(data.response);
-
-    // Existing USC identification scoring.
-    Object.assign(data, scoreLeachUsc(response));
-
-    // Written ideal-student description.
-    data.group_proto_resp = response.group_proto_resp ?? null;
-
-    // Convert valid 1–7 responses to numbers.
-    const score7 = raw => {
-        const value = Number(raw);
-
-        return Number.isInteger(value) &&
-            value >= 1 &&
-            value <= 7
-                ? value
-                : null;
-    };
-
-    // Three follow-up ratings.
-    for (const name of [
-        "group_proto_self",
-        "group_proto_motive",
-        "group_proto_possible"
-    ]) {
-        data[name] = score7(response[name]);
-    }
-
-    // Ideal-student and self trait ratings.
-    for (const name of [
-        "group_proto_trait",
-        "group_proto_traitSlf"
-    ]) {
-        const answers = readResponse(response[name]);
-
-        data[`${name}_json`] = JSON.stringify(answers);
-
-        for (const [trait, answer] of Object.entries(answers)) {
-            data[`${name}_${trait}`] = score7(answer);
+        on_finish: function (data) {
+            Object.assign(data, scoreLeachUsc(data.response));
         }
-    }
-}
     };
 
     return {
@@ -350,4 +310,3 @@ export function buildUscFourRoundExtension({
         plan: planForData
     };
 }
-
